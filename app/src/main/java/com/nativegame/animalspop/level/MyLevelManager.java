@@ -51,19 +51,33 @@ public class MyLevelManager extends LevelManager {
     }
 
     private void applyFirebaseTargetOverride(int level) {
-        if (level != 1) {
+        int xmlTarget = mLevel.mTarget;
+        FirebaseLevelConfigRepository.LevelConfig config =
+                mLevelConfigRepository.getLevelConfig(level);
+
+        if (config == null) {
+            Log.d(FirebaseLevelConfigRepository.LOG_TAG,
+                    "Level " + level + " không có Firebase config, sử dụng XML target="
+                            + xmlTarget);
             return;
         }
 
-        int xmlTarget = mLevel.mTarget;
-        Integer firebaseTarget = mLevelConfigRepository.getTargetCount(level);
-        if (firebaseTarget != null && firebaseTarget > 0) {
+        if (!config.isEnabled()) {
+            Log.w(FirebaseLevelConfigRepository.LOG_TAG,
+                    "Level " + level + " đang bị disabled, sử dụng XML target=" + xmlTarget);
+            return;
+        }
+
+        int firebaseTarget = config.getTargetCount();
+        if (firebaseTarget > 0) {
             mLevel.mTarget = firebaseTarget;
             Log.d(FirebaseLevelConfigRepository.LOG_TAG,
-                    "Level 1 target override: XML=" + xmlTarget + ", Firebase=" + firebaseTarget);
+                    "Level " + level + " target override: XML=" + xmlTarget
+                            + ", Firebase=" + firebaseTarget);
         } else {
-            Log.d(FirebaseLevelConfigRepository.LOG_TAG,
-                    "Level 1 target fallback: using XML=" + xmlTarget);
+            Log.w(FirebaseLevelConfigRepository.LOG_TAG,
+                    "Level " + level + " có Firebase target không hợp lệ=" + firebaseTarget
+                            + ", sử dụng XML target=" + xmlTarget);
         }
     }
 

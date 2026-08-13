@@ -60,7 +60,7 @@ public class MainActivity extends GameActivity {
         setContainerId(R.id.container);
         FirebaseLevelConfigRepository levelConfigRepository =
                 new FirebaseLevelConfigRepository(FirebaseFirestore.getInstance());
-        levelConfigRepository.preloadLevelOne();
+        levelConfigRepository.preloadAllLevels();
         setLevelManager(new MyLevelManager(this, levelConfigRepository));
         setSoundManager(new MySoundManager(this));
         mDatabaseHelper = new DatabaseHelper(this);

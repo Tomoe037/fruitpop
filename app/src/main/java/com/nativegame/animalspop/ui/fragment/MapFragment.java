@@ -1,6 +1,7 @@
 package com.nativegame.animalspop.ui.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.nativegame.animalspop.MainActivity;
 import com.nativegame.animalspop.item.Item;
+import com.nativegame.animalspop.level.FirebaseLevelConfigRepository;
 import com.nativegame.animalspop.ui.TransitionEffect;
 import com.nativegame.animalspop.R;
 import com.nativegame.animalspop.ui.UIEffect;
@@ -37,6 +39,7 @@ public class MapFragment extends GameFragment implements View.OnClickListener,
         TransitionEffect.OnTransitionListener {
 
     private static final int TOTAL_LEVEL = 15;
+    private static final String FIREBASE_LEVEL_ACCESS_TAG = "FIREBASE_LEVEL_ACCESS";
 
     private DatabaseHelper mDatabaseHelper;
     private LivesTimer mLivesTimer;
@@ -133,7 +136,11 @@ public class MapFragment extends GameFragment implements View.OnClickListener,
             TextView txtLevel = (TextView) findViewByName("btn_level_" + i);
 
             // Init button listener
-            if (i <= mCurrentLevel) {
+            boolean progressUnlocked = i <= mCurrentLevel;
+            Boolean cachedEnabled = FirebaseLevelConfigRepository.getCachedEnabled(i);
+            boolean firebaseEnabled = cachedEnabled == null || cachedEnabled;
+
+            if (progressUnlocked && firebaseEnabled) {
                 int level = i;
                 txtLevel.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -145,9 +152,25 @@ public class MapFragment extends GameFragment implements View.OnClickListener,
                 txtLevel.setBackgroundResource(R.drawable.btn_level);
                 txtLevel.setTextColor(getResources().getColor(R.color.brown));
                 UIEffect.createButtonEffect(txtLevel);
+
+                if (cachedEnabled == null) {
+                    Log.d(FIREBASE_LEVEL_ACCESS_TAG,
+                            "Level " + i + " unlocked by progress; Firebase cache unavailable");
+                } else {
+                    Log.d(FIREBASE_LEVEL_ACCESS_TAG,
+                            "Level " + i + " unlocked by progress and Firebase");
+                }
             } else {
+                txtLevel.setOnClickListener(null);
                 txtLevel.setBackgroundResource(R.drawable.btn_level_lock);
                 txtLevel.setTextColor(getResources().getColor(R.color.white));
+
+                if (!progressUnlocked) {
+                    Log.d(FIREBASE_LEVEL_ACCESS_TAG, "Level " + i + " locked by progress");
+                } else {
+                    Log.d(FIREBASE_LEVEL_ACCESS_TAG,
+                            "Level " + i + " locked by Firebase enabled=false");
+                }
             }
         }
     }
