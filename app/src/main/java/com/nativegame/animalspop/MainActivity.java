@@ -8,6 +8,7 @@ import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.nativegame.animalspop.database.DatabaseHelper;
+import com.nativegame.animalspop.level.FirebaseLevelConfigRepository;
 import com.nativegame.animalspop.ui.fragment.MenuFragment;
 import com.nativegame.animalspop.level.MyLevelManager;
 import com.nativegame.animalspop.sound.MySoundManager;
@@ -45,7 +46,6 @@ import com.nativegame.nattyengine.ui.GameActivity;
 public class MainActivity extends GameActivity {
 
     private static final String FIREBASE_TEST_TAG = "FIREBASE_TEST";
-    private static final String FIREBASE_LEVEL_TAG = "FIREBASE_LEVEL";
 
     private DatabaseHelper mDatabaseHelper;
     private AdManager mAdManager;
@@ -58,13 +58,15 @@ public class MainActivity extends GameActivity {
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         setContentView(R.layout.activity_main);
         setContainerId(R.id.container);
-        setLevelManager(new MyLevelManager(this));
+        FirebaseLevelConfigRepository levelConfigRepository =
+                new FirebaseLevelConfigRepository(FirebaseFirestore.getInstance());
+        levelConfigRepository.preloadLevelOne();
+        setLevelManager(new MyLevelManager(this, levelConfigRepository));
         setSoundManager(new MySoundManager(this));
         mDatabaseHelper = new DatabaseHelper(this);
         mAdManager = new AdManager(this);
         mLivesTimer = new LivesTimer(this);
         testFirestoreConnection();
-        testFirestoreLevelRead();
 
         // Init the ad
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
@@ -98,27 +100,6 @@ public class MainActivity extends GameActivity {
                 })
                 .addOnFailureListener(exception ->
                         Log.e(FIREBASE_TEST_TAG, "Kết nối Firestore thất bại", exception));
-    }
-
-    private void testFirestoreLevelRead() {
-        FirebaseFirestore.getInstance()
-                .collection("levels")
-                .document("level_1")
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Log.d(FIREBASE_LEVEL_TAG, "Đọc level thành công");
-                        Log.d(FIREBASE_LEVEL_TAG, "number = " + documentSnapshot.getLong("number"));
-                        Log.d(FIREBASE_LEVEL_TAG, "name = " + documentSnapshot.getString("name"));
-                        Log.d(FIREBASE_LEVEL_TAG, "shotLimit = " + documentSnapshot.getLong("shotLimit"));
-                        Log.d(FIREBASE_LEVEL_TAG, "targetCount = " + documentSnapshot.getLong("targetCount"));
-                        Log.d(FIREBASE_LEVEL_TAG, "enabled = " + documentSnapshot.getBoolean("enabled"));
-                    } else {
-                        Log.e(FIREBASE_LEVEL_TAG, "Không tìm thấy document levels/level_1");
-                    }
-                })
-                .addOnFailureListener(exception ->
-                        Log.e(FIREBASE_LEVEL_TAG, "Đọc level thất bại", exception));
     }
 
     public DatabaseHelper getDatabaseHelper() {

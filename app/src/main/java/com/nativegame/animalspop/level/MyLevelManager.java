@@ -1,6 +1,7 @@
 package com.nativegame.animalspop.level;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.Xml;
 
 import com.nativegame.nattyengine.level.Level;
@@ -24,10 +25,12 @@ public class MyLevelManager extends LevelManager {
     private String mLevelTagName;
 
     private final Context mContext;
+    private final FirebaseLevelConfigRepository mLevelConfigRepository;
     private MyLevel mLevel;
 
-    public MyLevelManager(Context context) {
+    public MyLevelManager(Context context, FirebaseLevelConfigRepository levelConfigRepository) {
         mContext = context;
+        mLevelConfigRepository = levelConfigRepository;
     }
 
     @Override
@@ -42,7 +45,26 @@ public class MyLevelManager extends LevelManager {
             e.printStackTrace();
         }
 
+        applyFirebaseTargetOverride(level);
+
         return mLevel;
+    }
+
+    private void applyFirebaseTargetOverride(int level) {
+        if (level != 1) {
+            return;
+        }
+
+        int xmlTarget = mLevel.mTarget;
+        Integer firebaseTarget = mLevelConfigRepository.getTargetCount(level);
+        if (firebaseTarget != null && firebaseTarget > 0) {
+            mLevel.mTarget = firebaseTarget;
+            Log.d(FirebaseLevelConfigRepository.LOG_TAG,
+                    "Level 1 target override: XML=" + xmlTarget + ", Firebase=" + firebaseTarget);
+        } else {
+            Log.d(FirebaseLevelConfigRepository.LOG_TAG,
+                    "Level 1 target fallback: using XML=" + xmlTarget);
+        }
     }
 
     private void parse(InputStream in) throws XmlPullParserException, IOException {
