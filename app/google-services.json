@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "362018812681",
+    "project_id": "fruit-pop-adventure",
+    "storage_bucket": "fruit-pop-adventure.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:362018812681:android:2fb1f076db316c96bd19d8",
+        "android_client_info": {
+          "package_name": "com.nativegame.animalspop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAD-UgZFMPwQPwqMkHM8xjBrMprN0GiJ_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

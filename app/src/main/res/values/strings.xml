@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Animals Pop</string>
+    <string name="app_name">Fruit Pop Adventure</string>
     <string name="app_version">1.1</string>
 
     <string name="txt_level">Level %1$d</string>
