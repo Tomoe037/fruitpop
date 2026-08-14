@@ -1,7 +1,6 @@
 package com.nativegame.animalspop;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
@@ -46,8 +45,6 @@ import com.nativegame.nattyengine.ui.GameActivity;
 
 public class MainActivity extends GameActivity {
 
-    private static final String FIREBASE_TEST_TAG = "FIREBASE_TEST";
-
     private DatabaseHelper mDatabaseHelper;
     private AdManager mAdManager;
     private LivesTimer mLivesTimer;
@@ -68,7 +65,6 @@ public class MainActivity extends GameActivity {
         mDatabaseHelper = new DatabaseHelper(this);
         mAdManager = new AdManager(this);
         mLivesTimer = new LivesTimer(this);
-        testFirestoreConnection();
 
         // Init the ad
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
@@ -83,25 +79,6 @@ public class MainActivity extends GameActivity {
             // Start the menu bgm
             getSoundManager().loadMusic(R.raw.happy_and_joyful_children);
         }
-    }
-
-    private void testFirestoreConnection() {
-        FirebaseFirestore.getInstance()
-                .collection("game_config")
-                .document("main")
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Log.d(FIREBASE_TEST_TAG, "Kết nối Firestore thành công");
-                        Log.d(FIREBASE_TEST_TAG, "gameName = " + documentSnapshot.getString("gameName"));
-                        Log.d(FIREBASE_TEST_TAG, "announcement = " + documentSnapshot.getString("announcement"));
-                        Log.d(FIREBASE_TEST_TAG, "maintenance = " + documentSnapshot.getBoolean("maintenance"));
-                    } else {
-                        Log.e(FIREBASE_TEST_TAG, "Không tìm thấy document game_config/main");
-                    }
-                })
-                .addOnFailureListener(exception ->
-                        Log.e(FIREBASE_TEST_TAG, "Kết nối Firestore thất bại", exception));
     }
 
     public DatabaseHelper getDatabaseHelper() {
