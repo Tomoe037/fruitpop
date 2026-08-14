@@ -15,6 +15,7 @@ import com.google.android.gms.ads.AdView;
 import com.nativegame.animalspop.MainActivity;
 import com.nativegame.animalspop.item.Item;
 import com.nativegame.animalspop.level.FirebaseLevelConfigRepository;
+import com.nativegame.animalspop.player.PlayerFirestoreRepository;
 import com.nativegame.animalspop.ui.TransitionEffect;
 import com.nativegame.animalspop.R;
 import com.nativegame.animalspop.ui.UIEffect;
@@ -42,6 +43,7 @@ public class MapFragment extends GameFragment implements View.OnClickListener,
     private static final String FIREBASE_LEVEL_ACCESS_TAG = "FIREBASE_LEVEL_ACCESS";
 
     private DatabaseHelper mDatabaseHelper;
+    private PlayerFirestoreRepository mPlayerFirestoreRepository;
     private LivesTimer mLivesTimer;
     private WheelTimer mWheelTimer;
     private TransitionEffect mTransitionEffect;
@@ -63,6 +65,7 @@ public class MapFragment extends GameFragment implements View.OnClickListener,
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mDatabaseHelper = ((MainActivity) getGameActivity()).getDatabaseHelper();
+        mPlayerFirestoreRepository = new PlayerFirestoreRepository(mDatabaseHelper);
         mLivesTimer = ((MainActivity) getGameActivity()).getLivesTimer();
         mWheelTimer = new WheelTimer(getGameActivity());
         mTransitionEffect = new TransitionEffect(getGameActivity());
@@ -300,12 +303,19 @@ public class MapFragment extends GameFragment implements View.OnClickListener,
     public void onResume() {
         super.onResume();
         mLivesTimer.start();
+        mPlayerFirestoreRepository.syncPlayer();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mLivesTimer.stop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mPlayerFirestoreRepository.shutdown();
     }
 
     @Override
