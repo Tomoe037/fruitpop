@@ -7,6 +7,7 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.nativegame.animalspop.auth.FirebasePlayerAuth;
 import com.nativegame.animalspop.database.DatabaseHelper;
 import com.nativegame.animalspop.level.FirebaseLevelConfigRepository;
 import com.nativegame.animalspop.ui.fragment.MenuFragment;
@@ -58,6 +59,7 @@ public class MainActivity extends GameActivity {
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         setContentView(R.layout.activity_main);
         setContainerId(R.id.container);
+        new FirebasePlayerAuth().signInIfNeeded();
         FirebaseLevelConfigRepository levelConfigRepository =
                 new FirebaseLevelConfigRepository(FirebaseFirestore.getInstance());
         levelConfigRepository.preloadAllLevels();
