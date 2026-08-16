@@ -46,6 +46,7 @@ public class MyLevelManager extends LevelManager {
         }
 
         applyFirebaseTargetOverride(level);
+        applyFirebaseShotOverride(level);
 
         return mLevel;
     }
@@ -79,6 +80,45 @@ public class MyLevelManager extends LevelManager {
                     "Level " + level + " có Firebase target không hợp lệ=" + firebaseTarget
                             + ", sử dụng XML target=" + xmlTarget);
         }
+    }
+
+    private void applyFirebaseShotOverride(int level) {
+        FirebaseLevelConfigRepository.LevelConfig config =
+                mLevelConfigRepository.getLevelConfig(level);
+
+        if (config == null || !config.isEnabled()) {
+            return;
+        }
+
+        int shotLimit = config.getShotLimit();
+        if (shotLimit < 5 || shotLimit > 100
+                || mLevel.mPlayer == null || mLevel.mPlayer.isEmpty()) {
+            return;
+        }
+
+        String xmlPlayer = mLevel.mPlayer;
+        int xmlPlayerLength = xmlPlayer.length();
+        String normalizedPlayer;
+
+        if (shotLimit < xmlPlayerLength) {
+            normalizedPlayer = xmlPlayer.substring(0, shotLimit);
+        } else if (shotLimit == xmlPlayerLength) {
+            normalizedPlayer = xmlPlayer;
+        } else {
+            StringBuilder playerBuilder = new StringBuilder(shotLimit);
+            for (int i = 0; i < shotLimit; i++) {
+                playerBuilder.append(xmlPlayer.charAt(i % xmlPlayerLength));
+            }
+            normalizedPlayer = playerBuilder.toString();
+        }
+
+        mLevel.mPlayer = normalizedPlayer;
+        mLevel.mMove = normalizedPlayer.length();
+
+        Log.d(FirebaseLevelConfigRepository.LOG_TAG,
+                "Level " + level + " shot override: XML playerLength=" + xmlPlayerLength
+                        + ", Firebase shotLimit=" + shotLimit
+                        + ", normalizedPlayerLength=" + normalizedPlayer.length());
     }
 
     private void parse(InputStream in) throws XmlPullParserException, IOException {

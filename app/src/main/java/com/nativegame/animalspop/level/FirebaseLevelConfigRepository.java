@@ -12,6 +12,7 @@ import java.util.Map;
 public class FirebaseLevelConfigRepository {
 
     public static final String LOG_TAG = "FIREBASE_LEVEL_CONFIG";
+    private static final int NO_SHOT_LIMIT_OVERRIDE = -1;
 
     private final FirebaseFirestore mFirestore;
     private static volatile Map<Integer, LevelConfig> sLevelConfigs = Collections.emptyMap();
@@ -28,6 +29,7 @@ public class FirebaseLevelConfigRepository {
 
                     for (QueryDocumentSnapshot document : querySnapshot) {
                         Long number = document.getLong("number");
+                        Long shotLimit = document.getLong("shotLimit");
                         Long targetCount = document.getLong("targetCount");
                         Boolean enabled = document.getBoolean("enabled");
 
@@ -39,8 +41,13 @@ public class FirebaseLevelConfigRepository {
                                 && targetCount <= Integer.MAX_VALUE
                                 && enabled != null) {
                             int levelNumber = number.intValue();
-                            loadedConfigs.put(levelNumber,
-                                    new LevelConfig(levelNumber, targetCount.intValue(), enabled));
+                            int cachedShotLimit = toShotLimitOverride(shotLimit);
+                            LevelConfig config = new LevelConfig(levelNumber, cachedShotLimit,
+                                    targetCount.intValue(), enabled);
+                            loadedConfigs.put(levelNumber, config);
+                            Log.d(LOG_TAG, "Level " + levelNumber + " config: shotLimit="
+                                    + cachedShotLimit + ", targetCount=" + config.getTargetCount()
+                                    + ", enabled=" + config.isEnabled());
                         } else {
                             Log.w(LOG_TAG, "Firebase config không hợp lệ tại "
                                     + document.getReference().getPath() + "; bỏ qua document");
@@ -62,6 +69,13 @@ public class FirebaseLevelConfigRepository {
         return sLevelConfigs.get(level);
     }
 
+    private static int toShotLimitOverride(Long shotLimit) {
+        if (shotLimit == null || shotLimit <= 0 || shotLimit > Integer.MAX_VALUE) {
+            return NO_SHOT_LIMIT_OVERRIDE;
+        }
+        return shotLimit.intValue();
+    }
+
     public static Boolean getCachedEnabled(int level) {
         LevelConfig config = sLevelConfigs.get(level);
         return config != null ? config.isEnabled() : null;
@@ -70,17 +84,23 @@ public class FirebaseLevelConfigRepository {
     public static final class LevelConfig {
 
         private final int mNumber;
+        private final int mShotLimit;
         private final int mTargetCount;
         private final boolean mEnabled;
 
-        private LevelConfig(int number, int targetCount, boolean enabled) {
+        private LevelConfig(int number, int shotLimit, int targetCount, boolean enabled) {
             mNumber = number;
+            mShotLimit = shotLimit;
             mTargetCount = targetCount;
             mEnabled = enabled;
         }
 
         public int getNumber() {
             return mNumber;
+        }
+
+        public int getShotLimit() {
+            return mShotLimit;
         }
 
         public int getTargetCount() {
