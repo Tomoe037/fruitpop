@@ -92,8 +92,8 @@ public class MapFragment extends GameFragment implements View.OnClickListener,
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mDatabaseHelper = ((MainActivity) getGameActivity()).getDatabaseHelper();
-        mPlayerFirestoreRepository = new PlayerFirestoreRepository(mDatabaseHelper);
         mLivesTimer = ((MainActivity) getGameActivity()).getLivesTimer();
+        mPlayerFirestoreRepository = new PlayerFirestoreRepository(mDatabaseHelper, mLivesTimer);
         mWheelTimer = new WheelTimer(getGameActivity());
         mTransitionEffect = new TransitionEffect(getGameActivity());
         mTransitionEffect.setListener(this);

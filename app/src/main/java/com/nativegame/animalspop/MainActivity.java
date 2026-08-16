@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.nativegame.animalspop.auth.FirebasePlayerAuth;
 import com.nativegame.animalspop.database.DatabaseHelper;
 import com.nativegame.animalspop.level.FirebaseLevelConfigRepository;
+import com.nativegame.animalspop.player.PlayerLivesAdminControlRepository;
 import com.nativegame.animalspop.ui.fragment.MenuFragment;
 import com.nativegame.animalspop.level.MyLevelManager;
 import com.nativegame.animalspop.sound.MySoundManager;
@@ -48,6 +49,7 @@ public class MainActivity extends GameActivity {
     private DatabaseHelper mDatabaseHelper;
     private AdManager mAdManager;
     private LivesTimer mLivesTimer;
+    private PlayerLivesAdminControlRepository mLivesAdminControlRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,8 @@ public class MainActivity extends GameActivity {
         mDatabaseHelper = new DatabaseHelper(this);
         mAdManager = new AdManager(this);
         mLivesTimer = new LivesTimer(this);
+        mLivesAdminControlRepository = new PlayerLivesAdminControlRepository(mLivesTimer);
+        mLivesAdminControlRepository.start();
 
         // Init the ad
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
@@ -91,6 +95,14 @@ public class MainActivity extends GameActivity {
 
     public LivesTimer getLivesTimer() {
         return mLivesTimer;
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mLivesAdminControlRepository != null) {
+            mLivesAdminControlRepository.shutdown();
+        }
+        super.onDestroy();
     }
 
 }

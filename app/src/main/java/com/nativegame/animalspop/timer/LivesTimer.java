@@ -20,6 +20,8 @@ public class LivesTimer {
     private static final String LIVES_PREF_KEY = "lives";
     private static final String MILLIS_LEFT_PREF_KEY = "millis_left";
     private static final String END_TIME_PREF_KEY = "end_time";
+    private static final String LAST_APPLIED_LIVES_COMMAND_ID_PREF_KEY =
+            "last_applied_lives_command_id";
 
     private static final long LIVES_CD = 1200000;   // 20 min = 1200000ms
     private static final int LIVES_MAX = 5;
@@ -34,15 +36,20 @@ public class LivesTimer {
     private int mLivesNum;
     private long mTimeLeftInMillis;
     private long mEndTime;
+    private boolean mIsActive;
 
     public LivesTimer(Activity activity) {
         mActivity = activity;
         mPrefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        mLivesNum = mPrefs.getInt(LIVES_PREF_KEY, LIVES_MAX);
+        mTimeLeftInMillis = mPrefs.getLong(MILLIS_LEFT_PREF_KEY, 0);
+        mEndTime = mPrefs.getLong(END_TIME_PREF_KEY, 0);
     }
 
     public void start() {
         mTxtLives = mActivity.findViewById(R.id.txt_lives);
         mTxtTime = mActivity.findViewById(R.id.txt_lives_time);
+        mIsActive = true;
 
         mLivesNum = mPrefs.getInt(LIVES_PREF_KEY, LIVES_MAX);
         if (mLivesNum == LIVES_MAX) {
@@ -93,7 +100,9 @@ public class LivesTimer {
 
         if (mCountDownTimer != null) {
             mCountDownTimer.cancel();
+            mCountDownTimer = null;
         }
+        mIsActive = false;
     }
 
     public void addLive() {
@@ -124,8 +133,57 @@ public class LivesTimer {
                 .apply();
     }
 
+    public void setLivesFromAdmin(int lives) {
+        setLivesFromAdmin(lives, null);
+    }
+
+    public void setLivesFromAdmin(int lives, String commandId) {
+        if (lives < 0 || lives > LIVES_MAX) {
+            throw new IllegalArgumentException("Lives must be between 0 and " + LIVES_MAX);
+        }
+
+        if (mCountDownTimer != null) {
+            mCountDownTimer.cancel();
+            mCountDownTimer = null;
+        }
+
+        mLivesNum = lives;
+        if (mLivesNum == LIVES_MAX) {
+            mTimeLeftInMillis = 0;
+            mEndTime = 0;
+            if (mIsActive) {
+                updateLivesText();
+            }
+        } else {
+            mTimeLeftInMillis = LIVES_CD;
+            mEndTime = System.currentTimeMillis() + LIVES_CD;
+            if (mIsActive) {
+                updateLivesText();
+                updateCountDownText();
+                startTimer();
+            }
+        }
+
+        SharedPreferences.Editor editor = mPrefs.edit()
+                .putInt(LIVES_PREF_KEY, mLivesNum)
+                .putLong(MILLIS_LEFT_PREF_KEY, mTimeLeftInMillis)
+                .putLong(END_TIME_PREF_KEY, mEndTime);
+        if (commandId != null) {
+            editor.putString(LAST_APPLIED_LIVES_COMMAND_ID_PREF_KEY, commandId);
+        }
+        editor.commit();
+    }
+
+    public String getLastAppliedLivesCommandId() {
+        return mPrefs.getString(LAST_APPLIED_LIVES_COMMAND_ID_PREF_KEY, null);
+    }
+
     public boolean isEnoughLives() {
         return mLivesNum > 0;
+    }
+
+    public int getLives() {
+        return mLivesNum;
     }
 
     public boolean isLivesFull() {

@@ -6,8 +6,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.nativegame.animalspop.database.DatabaseHelper;
 import com.nativegame.animalspop.item.Item;
+import com.nativegame.animalspop.timer.LivesTimer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,12 +26,14 @@ public class PlayerFirestoreRepository {
     private static final int TOTAL_LEVEL = 15;
 
     private final DatabaseHelper mDatabaseHelper;
+    private final LivesTimer mLivesTimer;
     private final FirebaseAuth mAuth;
     private final FirebaseFirestore mFirestore;
     private final ExecutorService mDatabaseExecutor;
 
-    public PlayerFirestoreRepository(DatabaseHelper databaseHelper) {
+    public PlayerFirestoreRepository(DatabaseHelper databaseHelper, LivesTimer livesTimer) {
         mDatabaseHelper = databaseHelper;
+        mLivesTimer = livesTimer;
         mAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
         mDatabaseExecutor = Executors.newSingleThreadExecutor();
@@ -43,14 +47,15 @@ public class PlayerFirestoreRepository {
         }
 
         String uid = currentUser.getUid();
+        int lives = mLivesTimer.getLives();
         try {
-            mDatabaseExecutor.execute(() -> syncPlayerSnapshot(uid));
+            mDatabaseExecutor.execute(() -> syncPlayerSnapshot(uid, lives));
         } catch (RuntimeException exception) {
             Log.e(TAG, "Không thể lên lịch player sync cho UID = " + uid, exception);
         }
     }
 
-    private void syncPlayerSnapshot(String uid) {
+    private void syncPlayerSnapshot(String uid, int lives) {
         try {
             ArrayList<Integer> levelStars = mDatabaseHelper.getAllLevelStar();
             int currentLevel = Math.min(levelStars.size() + 1, TOTAL_LEVEL);
@@ -71,6 +76,7 @@ public class PlayerFirestoreRepository {
             player.put("currentLevel", currentLevel);
             player.put("totalStars", totalStars);
             player.put("coins", coins);
+            player.put("lives", lives);
             player.put("boosters", boosters);
             player.put("updatedAt", FieldValue.serverTimestamp());
 
@@ -78,13 +84,14 @@ public class PlayerFirestoreRepository {
             int syncedTotalStars = totalStars;
             mFirestore.collection("players")
                     .document(uid)
-                    .set(player)
+                    .set(player, SetOptions.merge())
                     .addOnSuccessListener(unused -> {
                         Log.d(TAG, "Player sync thành công");
                         Log.d(TAG, "UID = " + uid);
                         Log.d(TAG, "currentLevel = " + syncedCurrentLevel);
                         Log.d(TAG, "totalStars = " + syncedTotalStars);
                         Log.d(TAG, "coins = " + coins);
+                        Log.d(TAG, "lives = " + lives);
                     })
                     .addOnFailureListener(exception ->
                             Log.e(TAG, "Player sync thất bại khi ghi Firestore cho UID = " + uid,
