@@ -21,6 +21,10 @@ public class MyLevelManager extends LevelManager {
 
     private static final String FILE_NAME = "data.xml";
     private static final String FILE_TAG = "level";
+    private static final String DYNAMIC_LEVEL_LOG_TAG = "FIREBASE_DYNAMIC_LEVEL";
+    private static final int MIN_BASE_LEVEL = 1;
+    private static final int MAX_BASE_LEVEL = 15;
+    private static final int SAFE_FALLBACK_BASE_LEVEL = 1;
 
     private String mLevelTagName;
 
@@ -35,8 +39,15 @@ public class MyLevelManager extends LevelManager {
 
     @Override
     public Level getLevel(int level) {
-        mLevelTagName = "level" + level;
-        mLevel = new MyLevel(level);
+        int logicalLevel = level;
+        FirebaseLevelConfigRepository.LevelConfig config =
+                mLevelConfigRepository.getLevelConfig(logicalLevel);
+        int baseLevel = resolveBaseLevel(logicalLevel, config);
+
+        mLevelTagName = "level" + baseLevel;
+        mLevel = new MyLevel(logicalLevel);
+        Log.d(DYNAMIC_LEVEL_LOG_TAG,
+                "Logical Level " + logicalLevel + " uses base Level " + baseLevel);
         // Open file
         try {
             InputStream file = mContext.getAssets().open(FILE_NAME);
@@ -45,16 +56,39 @@ public class MyLevelManager extends LevelManager {
             e.printStackTrace();
         }
 
-        applyFirebaseTargetOverride(level);
-        applyFirebaseShotOverride(level);
+        mLevel.mLevel = logicalLevel;
+        applyFirebaseTargetOverride(logicalLevel, config);
+        applyFirebaseShotOverride(logicalLevel, config);
+
+        Log.d(DYNAMIC_LEVEL_LOG_TAG,
+                "Dynamic Level " + logicalLevel + " ready: baseLevel=" + baseLevel
+                        + ", target=" + mLevel.mTarget + ", move=" + mLevel.mMove);
 
         return mLevel;
     }
 
-    private void applyFirebaseTargetOverride(int level) {
+    private int resolveBaseLevel(int logicalLevel,
+                                 FirebaseLevelConfigRepository.LevelConfig config) {
+        if (config != null
+                && config.getBaseLevel() >= MIN_BASE_LEVEL
+                && config.getBaseLevel() <= MAX_BASE_LEVEL) {
+            return config.getBaseLevel();
+        }
+
+        if (logicalLevel >= MIN_BASE_LEVEL && logicalLevel <= MAX_BASE_LEVEL) {
+            return logicalLevel;
+        }
+
+        Log.e(DYNAMIC_LEVEL_LOG_TAG,
+                "Logical Level " + logicalLevel
+                        + " has no valid baseLevel; safely falls back to base Level "
+                        + SAFE_FALLBACK_BASE_LEVEL);
+        return SAFE_FALLBACK_BASE_LEVEL;
+    }
+
+    private void applyFirebaseTargetOverride(
+            int level, FirebaseLevelConfigRepository.LevelConfig config) {
         int xmlTarget = mLevel.mTarget;
-        FirebaseLevelConfigRepository.LevelConfig config =
-                mLevelConfigRepository.getLevelConfig(level);
 
         if (config == null) {
             Log.d(FirebaseLevelConfigRepository.LOG_TAG,
@@ -82,10 +116,8 @@ public class MyLevelManager extends LevelManager {
         }
     }
 
-    private void applyFirebaseShotOverride(int level) {
-        FirebaseLevelConfigRepository.LevelConfig config =
-                mLevelConfigRepository.getLevelConfig(level);
-
+    private void applyFirebaseShotOverride(
+            int level, FirebaseLevelConfigRepository.LevelConfig config) {
         if (config == null || !config.isEnabled()) {
             return;
         }
