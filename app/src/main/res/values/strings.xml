@@ -14,6 +14,7 @@
     <string name="txt_color_ball">Color Ball</string>
     <string name="txt_fireball">Fireball</string>
     <string name="txt_bomb">Bomb</string>
+    <string name="txt_cut_ball">Cut Ball</string>
     <string name="txt_confirm">Buy this item ?</string>
     <string name="txt_booster">New Booster</string>
     <string name="txt_exit">Exit game ?</string>

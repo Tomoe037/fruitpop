@@ -22,24 +22,28 @@ public class ProductManager {
         Product productColorBall = new Product(Item.COLOR_BALL, 50);
         Product productFireball = new Product(Item.FIREBALL, 60);
         Product productBomb = new Product(Item.BOMB, 70);
+        Product productCutBall = new Product(Item.CUT_BALL, 60);
 
         //Init product view id
         productWatchAd.setView(R.drawable.product_coin_50, R.drawable.btn_watch_ad);
         productColorBall.setView(R.drawable.product_color_ball, R.drawable.btn_price_50);
         productFireball.setView(R.drawable.product_fireball, R.drawable.btn_price_60);
         productBomb.setView(R.drawable.product_bomb, R.drawable.btn_price_70);
+        productCutBall.setView(R.drawable.product_cut_ball, R.drawable.btn_price_60);
 
         // Init product description
         productWatchAd.setDescription(activity.getString(R.string.txt_coins));
         productColorBall.setDescription(activity.getString(R.string.txt_color_ball));
         productFireball.setDescription(activity.getString(R.string.txt_fireball));
         productBomb.setDescription(activity.getString(R.string.txt_bomb));
+        productCutBall.setDescription(activity.getString(R.string.txt_cut_ball));
 
         // Add to list
         mProductList.add(productWatchAd);
         mProductList.add(productColorBall);
         mProductList.add(productFireball);
         mProductList.add(productBomb);
+        mProductList.add(productCutBall);
     }
 
     public List<Product> getAllProducts() {

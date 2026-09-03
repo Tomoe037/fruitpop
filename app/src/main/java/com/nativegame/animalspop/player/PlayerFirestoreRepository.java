@@ -70,6 +70,7 @@ public class PlayerFirestoreRepository {
             boosters.put("colorBall", mDatabaseHelper.getItemNum(Item.COLOR_BALL));
             boosters.put("fireball", mDatabaseHelper.getItemNum(Item.FIREBALL));
             boosters.put("bomb", mDatabaseHelper.getItemNum(Item.BOMB));
+            boosters.put("cutBall", mDatabaseHelper.getItemNum(Item.CUT_BALL));
 
             Map<String, Object> player = new HashMap<>();
             player.put("playerId", uid);

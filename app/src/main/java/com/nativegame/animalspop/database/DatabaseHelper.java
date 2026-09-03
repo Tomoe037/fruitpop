@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "star.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final int INITIAL_COIN = 100;
 
     // Star table schema
@@ -54,8 +54,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        // This method will call when new version release
-        // if (oldVersion == 1 && newVersion == 2) ...
+        if (oldVersion < 2) {
+            insertItemIfAbsent(sqLiteDatabase, Item.CUT_BALL, 0);
+        }
     }
 
     private void initItem(SQLiteDatabase sqLiteDatabase) {
@@ -79,10 +80,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         valuesBomb.put(ITEM_COLUMN_NAME, Item.BOMB);
         valuesBomb.put(ITEM_COLUMN_NUM, 0);
 
+        // Insert cut ball to db
+        ContentValues valuesCutBall = new ContentValues();
+        valuesCutBall.put(ITEM_COLUMN_NAME, Item.CUT_BALL);
+        valuesCutBall.put(ITEM_COLUMN_NUM, 0);
+
         sqLiteDatabase.insert(ITEM_TABLE_NAME, null, valuesCoin);
         sqLiteDatabase.insert(ITEM_TABLE_NAME, null, valuesColorBall);
         sqLiteDatabase.insert(ITEM_TABLE_NAME, null, valuesFireball);
         sqLiteDatabase.insert(ITEM_TABLE_NAME, null, valuesBomb);
+        sqLiteDatabase.insert(ITEM_TABLE_NAME, null, valuesCutBall);
+    }
+
+    private void insertItemIfAbsent(SQLiteDatabase sqLiteDatabase, String name, int number) {
+        ContentValues values = new ContentValues();
+        values.put(ITEM_COLUMN_NAME, name);
+        values.put(ITEM_COLUMN_NUM, number);
+        sqLiteDatabase.insertWithOnConflict(
+                ITEM_TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
     }
 
     //-----------------------------------------------------------

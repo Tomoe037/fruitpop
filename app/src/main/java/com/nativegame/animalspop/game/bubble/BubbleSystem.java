@@ -123,6 +123,26 @@ public class BubbleSystem {
         }
     }
 
+    public boolean isRegularColoredBubble(Bubble bubble) {
+        if (bubble == null || bubble.getClass() != Bubble.class) {
+            return false;
+        }
+
+        return bubble.mBubbleColor == BubbleColor.RED
+                || bubble.mBubbleColor == BubbleColor.BLUE
+                || bubble.mBubbleColor == BubbleColor.YELLOW
+                || bubble.mBubbleColor == BubbleColor.GREEN;
+    }
+
+    public boolean popRegularBubble(Bubble bubble) {
+        if (!isRegularColoredBubble(bubble)) {
+            return false;
+        }
+
+        bubble.popBubble();
+        return true;
+    }
+
     private BubbleColor getBubbleColor(char color) {
         switch (color) {
             case 'b':

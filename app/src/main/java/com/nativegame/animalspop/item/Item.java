@@ -9,4 +9,5 @@ public class Item {
     public static final String COLOR_BALL = "Color_ball";
     public static final String FIREBALL = "Fireball";
     public static final String BOMB = "Bomb";
+    public static final String CUT_BALL = "Cut_ball";
 }
