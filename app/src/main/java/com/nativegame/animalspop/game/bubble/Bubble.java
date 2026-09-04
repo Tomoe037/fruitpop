@@ -192,6 +192,12 @@ public class Bubble extends CollidableSprite {
         mPop = true;
     }
 
+    public void resetDepthIfNotPopping() {
+        if (!mPop) {
+            mDepth = -1;
+        }
+    }
+
     public void popFloater() {
         // We prevent popping multiple times
         if (mBubbleColor == BubbleColor.BLANK) {

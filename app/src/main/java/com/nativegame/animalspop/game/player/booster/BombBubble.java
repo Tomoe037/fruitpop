@@ -11,6 +11,7 @@ import com.nativegame.nattyengine.Game;
 import com.nativegame.nattyengine.entity.particles.ParticleSystem;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -116,6 +117,8 @@ public class BombBubble extends BoosterBubble {
     private void bfs(Bubble root) {
         List<Bubble> removedList = new ArrayList<>();
         Queue<Bubble> queue = new LinkedList<>();
+        HashSet<Bubble> visited = new HashSet<>();
+        visited.add(root);
         root.mDepth = 0;
         queue.offer(root);
 
@@ -124,10 +127,11 @@ public class BombBubble extends BoosterBubble {
             removedList.add(currentBubble);
             for (Bubble b : currentBubble.mEdges) {
                 // Unvisited bubble
-                if (b != null && b.mDepth == -1) {
+                if (b != null && !visited.contains(b)) {
                     int depth = currentBubble.mDepth + 1;
                     if (depth <= 2) {
                         b.mDepth = depth;
+                        visited.add(b);
                         queue.offer(b);
                     }
                 }
@@ -137,6 +141,7 @@ public class BombBubble extends BoosterBubble {
         // Update bubble after bfs
         for (Bubble b : removedList) {
             b.popBubble();
+            b.resetDepthIfNotPopping();
         }
         removedList.clear();
     }
