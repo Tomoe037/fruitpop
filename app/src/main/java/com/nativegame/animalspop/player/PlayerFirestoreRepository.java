@@ -23,8 +23,6 @@ import java.util.concurrent.Executors;
 public class PlayerFirestoreRepository {
 
     private static final String TAG = "FIREBASE_PLAYER_SYNC";
-    private static final int TOTAL_LEVEL = 15;
-
     private final DatabaseHelper mDatabaseHelper;
     private final LivesTimer mLivesTimer;
     private final FirebaseAuth mAuth;
@@ -58,7 +56,7 @@ public class PlayerFirestoreRepository {
     private void syncPlayerSnapshot(String uid, int lives) {
         try {
             ArrayList<Integer> levelStars = mDatabaseHelper.getAllLevelStar();
-            int currentLevel = Math.min(levelStars.size() + 1, TOTAL_LEVEL);
+            int currentLevel = levelStars.size() + 1;
             int totalStars = 0;
             for (int star : levelStars) {
                 totalStars += star;
