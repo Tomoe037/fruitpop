@@ -10,4 +10,5 @@ public class Item {
     public static final String FIREBALL = "Fireball";
     public static final String BOMB = "Bomb";
     public static final String CUT_BALL = "Cut_ball";
+    public static final String LIGHTNING_BALL = "Lightning_ball";
 }

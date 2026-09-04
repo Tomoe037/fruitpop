@@ -143,6 +143,28 @@ public class BubbleSystem {
         return true;
     }
 
+    public int popRegularBubblesByColor(Bubble hitBubble) {
+        if (!isRegularColoredBubble(hitBubble)) {
+            return 0;
+        }
+
+        BubbleColor targetColor = hitBubble.mBubbleColor;
+        List<Bubble> targets = new ArrayList<>();
+        for (List<Bubble> row : mBubbleList) {
+            for (Bubble bubble : row) {
+                if (bubble.getClass() == Bubble.class
+                        && bubble.mBubbleColor == targetColor) {
+                    targets.add(bubble);
+                }
+            }
+        }
+
+        for (Bubble target : targets) {
+            target.popBubble();
+        }
+        return targets.size();
+    }
+
     private BubbleColor getBubbleColor(char color) {
         switch (color) {
             case 'b':

@@ -6,6 +6,7 @@
     <dimen name="txt_dialog_score_size">40sp</dimen>
     <dimen name="txt_state_size">17sp</dimen>
     <dimen name="txt_booster_size">17sp</dimen>
+    <dimen name="txt_game_booster_size">14sp</dimen>
     <dimen name="txt_switch_size">30sp</dimen>
     <dimen name="txt_level_size">22sp</dimen>
     <dimen name="txt_tutorial_size">22sp</dimen>
@@ -20,6 +21,8 @@
     <dimen name="btn_wheel_width">70dp</dimen>
     <dimen name="btn_booster_width">60dp</dimen>
     <dimen name="btn_booster_num_width">25dp</dimen>
+    <dimen name="btn_game_booster_width">44dp</dimen>
+    <dimen name="btn_game_booster_num_width">20dp</dimen>
     <dimen name="btn_switch_width">80dp</dimen>
     <dimen name="btn_shop_width">100dp</dimen>
     <dimen name="btn_start_width">100dp</dimen>
@@ -54,6 +57,7 @@
     <!-- Margin -->
     <dimen name="margin_5">5dp</dimen>
     <dimen name="margin_10">10dp</dimen>
+    <dimen name="margin_game_booster">2dp</dimen>
     <dimen name="margin_20">20dp</dimen>
     <dimen name="margin_30">30dp</dimen>
     <dimen name="margin_overlap">-30dp</dimen>

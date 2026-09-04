@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "star.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final int INITIAL_COIN = 100;
 
     // Star table schema
@@ -57,6 +57,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion < 2) {
             insertItemIfAbsent(sqLiteDatabase, Item.CUT_BALL, 0);
         }
+        if (oldVersion < 3) {
+            insertItemIfAbsent(sqLiteDatabase, Item.LIGHTNING_BALL, 0);
+        }
     }
 
     private void initItem(SQLiteDatabase sqLiteDatabase) {
@@ -85,11 +88,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         valuesCutBall.put(ITEM_COLUMN_NAME, Item.CUT_BALL);
         valuesCutBall.put(ITEM_COLUMN_NUM, 0);
 
+        // Insert lightning ball to db
+        ContentValues valuesLightningBall = new ContentValues();
+        valuesLightningBall.put(ITEM_COLUMN_NAME, Item.LIGHTNING_BALL);
+        valuesLightningBall.put(ITEM_COLUMN_NUM, 0);
+
         sqLiteDatabase.insert(ITEM_TABLE_NAME, null, valuesCoin);
         sqLiteDatabase.insert(ITEM_TABLE_NAME, null, valuesColorBall);
         sqLiteDatabase.insert(ITEM_TABLE_NAME, null, valuesFireball);
         sqLiteDatabase.insert(ITEM_TABLE_NAME, null, valuesBomb);
         sqLiteDatabase.insert(ITEM_TABLE_NAME, null, valuesCutBall);
+        sqLiteDatabase.insert(ITEM_TABLE_NAME, null, valuesLightningBall);
     }
 
     private void insertItemIfAbsent(SQLiteDatabase sqLiteDatabase, String name, int number) {

@@ -23,6 +23,7 @@ public class ProductManager {
         Product productFireball = new Product(Item.FIREBALL, 60);
         Product productBomb = new Product(Item.BOMB, 70);
         Product productCutBall = new Product(Item.CUT_BALL, 60);
+        Product productLightningBall = new Product(Item.LIGHTNING_BALL, 70);
 
         //Init product view id
         productWatchAd.setView(R.drawable.product_coin_50, R.drawable.btn_watch_ad);
@@ -30,6 +31,7 @@ public class ProductManager {
         productFireball.setView(R.drawable.product_fireball, R.drawable.btn_price_60);
         productBomb.setView(R.drawable.product_bomb, R.drawable.btn_price_70);
         productCutBall.setView(R.drawable.product_cut_ball, R.drawable.btn_price_60);
+        productLightningBall.setView(R.drawable.product_lightning_ball, R.drawable.btn_price_70);
 
         // Init product description
         productWatchAd.setDescription(activity.getString(R.string.txt_coins));
@@ -37,6 +39,7 @@ public class ProductManager {
         productFireball.setDescription(activity.getString(R.string.txt_fireball));
         productBomb.setDescription(activity.getString(R.string.txt_bomb));
         productCutBall.setDescription(activity.getString(R.string.txt_cut_ball));
+        productLightningBall.setDescription(activity.getString(R.string.txt_lightning_ball));
 
         // Add to list
         mProductList.add(productWatchAd);
@@ -44,6 +47,7 @@ public class ProductManager {
         mProductList.add(productFireball);
         mProductList.add(productBomb);
         mProductList.add(productCutBall);
+        mProductList.add(productLightningBall);
     }
 
     public List<Product> getAllProducts() {
